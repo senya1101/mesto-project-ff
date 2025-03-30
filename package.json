@@ -1,0 +1,15 @@
+{
+  "name": "mesto-project-ff",
+  "version": "1.0.0",
+  "description": "https://github.com/senya1101/mesto-project-ff",
+  "main": "/src/scripts/index.js",
+  "scripts": {
+    "build": "rm -rf dist && webpack --mode=development"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "webpack": "^5.98.0",
+    "webpack-cli": "^6.0.1"
+  }
+}
