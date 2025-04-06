@@ -12,7 +12,10 @@ function escapeClickHandler(evt) {
 }
 
 export function openModal(modal) {
-    modal.classList.add('popup_is-opened');
+    modal.classList.add("popup_is-animated");  // сначала анимация
+    setTimeout(() => {
+        modal.classList.add("popup_is-opened");  // потом только открытие
+    }, 1);
     modal.addEventListener('click', overlayClickHandler);
     document.addEventListener('keydown',escapeClickHandler)
 }

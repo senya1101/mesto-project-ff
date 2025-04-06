@@ -9,6 +9,9 @@ const newCardModal = document.querySelector('.popup_type_new-card');
 const imageModal = document.querySelector('.popup_type_image');
 const editProfileModal = document.querySelector('.popup_type_edit');
 
+const imageModalImage = imageModal.querySelector('.popup__image');
+const imageModalCaption = imageModal.querySelector('.popup__caption');
+
 const editProfileForm = document.forms['edit-profile']
 const profileName = document.querySelector('.profile__title')
 const profileNameInput = editProfileForm.elements.name;
@@ -17,15 +20,21 @@ const profileDescriptionInput = editProfileForm.elements.description;
 const newPlaceForm = document.forms['new-place']
 
 function handleImageClick(evt) {
-    imageModal.querySelector('.popup__image').src = evt.target.src;
-    imageModal.querySelector('.popup__caption').textContent = evt.target.alt;
+   imageModalImage.src = evt.target.src;
+    imageModalImage.alt = evt.target.alt;
+    imageModalCaption.textContent = evt.target.alt;
     openModal(imageModal)
 }
 
+function renderCard(item, method = "prepend") {
+    const cardElement = createCard(item, {deleteCard, handleLike, handleImageClick});
+    cardsList[method](cardElement);
+}
+
+
 
 initialCards.forEach((card) => {
-    const newCard = createCard(card, deleteCard, handleLike, handleImageClick);
-    cardsList.append(newCard);
+    renderCard(card, "append");
 });
 
 
@@ -58,9 +67,7 @@ newPlaceForm.addEventListener('submit', evt => {
     evt.preventDefault();
     const placeNameInput = newPlaceForm.elements['place-name']
     const placeLinkInput = newPlaceForm.elements.link
-    const newCard = createCard({name: placeNameInput.value, link: placeLinkInput.value},
-        deleteCard, handleLike, handleImageClick);
-    cardsList.prepend(newCard);
+    renderCard({name: placeNameInput.value, link: placeLinkInput.value});
     newPlaceForm.reset();
     closeModal(newCardModal);
 })
