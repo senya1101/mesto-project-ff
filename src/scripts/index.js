@@ -37,19 +37,6 @@ function handleImageClick(evt) {
     openModal(imageModal)
 }
 
-// function renderUser() {
-//     getUser().then(res => {
-//             if (res.ok) return res.json()
-//             else return Promise.reject(res.status)
-//         }
-//     ).catch(err => console.log(err))
-//         .then(res => {
-//             profileName.innerText = res.name;
-//             profileDescription.innerText = res.about;
-//             profileAvatar.style.backgroundImage = 'url(' + res.avatar + ')';
-//         });
-// }
-// renderUser()
 
 function renderCard(item, method = "prepend") {
     const cardElement = createCard(item, {deleteCard, handleLike, handleImageClick});
