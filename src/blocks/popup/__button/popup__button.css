@@ -9,14 +9,23 @@
   justify-content: center;
   background: #000;
   border-radius: 2px;
-  border: none;
-  transition: visibility 0s, background 0.3s;
+  border: 1px transparent solid;
+  transition: visibility 0s, background 0.3s, border-color 0.3s, color 0.3s;
   margin-top: 48px;
 }
 
 .popup__button:hover {
   background: rgba(0, 0, 0, 0.8);
   cursor: pointer;
+}
+
+.popup__button_disabled {
+  opacity: 0.2;
+  border-color: #000;
+  background: #fff;
+  color: #000;
+  cursor: not-allowed;
+  pointer-events: none;
 }
 
 @media screen and (max-width: 568px) {

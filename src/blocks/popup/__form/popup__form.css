@@ -1,3 +1,8 @@
 .popup__form {
   margin-top: 27px;
 }
+.popup__form_label {
+  position: relative;
+  display: flex;
+  margin-block-end: 38px;
+}

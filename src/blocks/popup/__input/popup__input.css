@@ -8,10 +8,29 @@
   box-sizing: border-box;
   padding: 10px 0 0;
   margin-bottom: 10px;
+  transition: border-color .3s;
 }
 
 .popup__input:last-of-type {
   margin-bottom: 0;
+}
+
+.popup__input_type_error {
+  border-color: #ff0000
+}
+
+.popup__input-error {
+  position: absolute;
+  top: calc(100% + 5px);
+  left: 0;
+  color: #ff0000;
+  font-size: 12px;
+  opacity: 0;
+  transition: .3s;
+}
+
+.popup__input-error_active {
+  opacity: 1;
 }
 
 @media screen and (max-width: 568px) {
