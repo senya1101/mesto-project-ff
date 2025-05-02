@@ -1,3 +1,6 @@
+@import url('-count/card__like-count.css');
+@import url('-button/card__like-button.css');
+
 .card__like {
     display: flex;
     flex-direction: column;
