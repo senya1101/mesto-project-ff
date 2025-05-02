@@ -6,6 +6,7 @@
     position: relative;
     min-width: 100px;
     min-height: 50px;
+    overflow: hidden;
 }
 
 .toast__content::before {
