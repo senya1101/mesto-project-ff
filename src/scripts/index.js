@@ -57,7 +57,6 @@ function renderPage() {
         if (responses.every(res => res.ok))
             return Promise.all(responses.map(res => res.json()))
         else {
-            console.log(responses)
             return Promise.reject(responses.filter(res => !res.ok)[0].status)
         }
     })
@@ -74,7 +73,6 @@ function renderPage() {
                 renderCard(card, isLiked, deletePerm, "append");
             })
         }).catch(err => {
-            console.log(78)
             errorMessage.innerText = err
             showToast(errorToast)
     })
@@ -127,10 +125,15 @@ editProfileForm.addEventListener('submit', evt => {
             else
                 return Promise.reject(res.status)
         }
-    ).catch(err => console.log(err)).then(data => {
+    ).then(data => {
+        errorMessage.innerText = ''
+        closeToast(errorToast)
         profileName.textContent = data.name;
         profileDescription.textContent = data.about;
         closeModal(editProfileModal);
+    }).catch(err => {
+        errorMessage.innerText = err
+        showToast(errorToast)
     }).finally(() => {
         setLoading(false, editProfileForm);
     })
@@ -148,13 +151,15 @@ newPlaceForm.addEventListener('submit', evt => {
             else
                 return Promise.reject(res.status)
         }
-    ).catch(err => {
-        console.log(err)
-        openModal(errorModal)
-    }).then(data => {
+    ).then(data => {
+        errorMessage.innerText = ''
+        closeToast(errorToast)
         renderCard(data, false, true);
         newPlaceForm.reset();
         closeModal(newCardModal);
+    }).catch(err => {
+        errorMessage.innerText = err
+        showToast(errorToast)
     }).finally(() => {
         setLoading(false, newPlaceForm);
     })
@@ -169,11 +174,17 @@ editAvatarForm.addEventListener('submit', evt => {
         if (res.ok)
             return res.json()
         else return Promise.reject(res.status)
-    }).catch(err => console.log(err))
+    })
         .then(data => {
+            errorMessage.innerText = ''
+            closeToast(errorToast)
             profileAvatar.style.backgroundImage = 'url(' + data.avatar + ')';
             editAvatarForm.reset();
             closeModal(editAvatarModal);
+        })
+        .catch(err => {
+            errorMessage.innerText = err
+            showToast(errorToast)
         })
         .finally(() => {
             setLoading(false, editAvatarForm)
