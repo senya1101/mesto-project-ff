@@ -1,0 +1,34 @@
+.toast__content {
+    background-color: #fff;
+    border-radius: 10px;
+    box-sizing: border-box;
+    padding: 10px 20px;
+    position: relative;
+    min-width: 100px;
+    min-height: 50px;
+}
+
+.toast__content::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.3);
+    height: 100%;
+    inline-size: 100%;
+    transform-origin: left center;
+}
+
+
+.toast_is-opened .toast__content::before {
+    animation: toast_is-opened 5s linear 1 ;
+}
+
+@keyframes toast_is-opened {
+    from {
+        transform: scaleX(0);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}

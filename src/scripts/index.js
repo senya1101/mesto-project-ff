@@ -3,6 +3,7 @@ import {createCard, deleteCard, handleLike} from "../components/card";
 import {openModal, closeModal} from '../components/modal'
 import {enableValidation, clearValidation} from "./validation";
 import {editProfile, getCards, getUser, newCard, updateAvatar} from "./api";
+import {closeToast, showToast} from "../components/toast";
 
 const cardsList = document.querySelector('.places__list');
 
@@ -10,7 +11,6 @@ const newCardModal = document.querySelector('.popup_type_new-card');
 const imageModal = document.querySelector('.popup_type_image');
 const editProfileModal = document.querySelector('.popup_type_edit');
 const editAvatarModal = document.querySelector('.popup_type_avatar');
-
 
 const imageModalImage = imageModal.querySelector('.popup__image');
 const imageModalCaption = imageModal.querySelector('.popup__caption');
@@ -26,6 +26,9 @@ const newPlaceForm = document.forms['new-place']
 const editAvatarForm = document.forms['edit-avatar'];
 const avatarInput = editAvatarForm.elements.picture;
 
+
+const errorToast = document.querySelector('.toast_type_error');
+const errorMessage = errorToast.querySelector('.toast__message');
 
 const validationSettings = {
     formSelector: '.popup__form',
@@ -53,9 +56,13 @@ function renderPage() {
     Promise.all([getUser(), getCards()]).then(responses => {
         if (responses.every(res => res.ok))
             return Promise.all(responses.map(res => res.json()))
-        else return responses.map(res => Promise.reject(res.status))
-    }).catch(err => console.log(err))
+        else {
+            console.log(responses)
+            return Promise.reject(responses.filter(res => !res.ok)[0].status)
+        }
+    })
         .then(data => {
+            closeToast(errorToast)
             const userData = data[0]
             const cards = data[1]
             profileName.innerText = userData.name;
@@ -65,8 +72,12 @@ function renderPage() {
                 const isLiked = card.likes.some(like => like._id === userData._id)
                 const deletePerm = userData._id === card.owner._id;
                 renderCard(card, isLiked, deletePerm, "append");
-            });
-        });
+            })
+        }).catch(err => {
+            console.log(78)
+            errorMessage.innerText = err
+            showToast(errorToast)
+    })
 }
 
 renderPage()
@@ -120,7 +131,7 @@ editProfileForm.addEventListener('submit', evt => {
         profileName.textContent = data.name;
         profileDescription.textContent = data.about;
         closeModal(editProfileModal);
-    }).finally(()=>{
+    }).finally(() => {
         setLoading(false, editProfileForm);
     })
 })
@@ -137,11 +148,14 @@ newPlaceForm.addEventListener('submit', evt => {
             else
                 return Promise.reject(res.status)
         }
-    ).catch(err => console.log(err)).then(data => {
+    ).catch(err => {
+        console.log(err)
+        openModal(errorModal)
+    }).then(data => {
         renderCard(data, false, true);
         newPlaceForm.reset();
         closeModal(newCardModal);
-    }).finally(()=>{
+    }).finally(() => {
         setLoading(false, newPlaceForm);
     })
 

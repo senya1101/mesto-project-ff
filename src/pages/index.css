@@ -8,6 +8,10 @@
 @import url('../blocks/places/places.css');
 @import url('../blocks/card/card.css');
 @import url('../blocks/popup/popup.css');
+@import url('../blocks/toast/toast.css');
 @import url('../blocks/popup/_is-animated/popup_is-animated.css');
 @import url('../blocks/popup/_is-opened/popup_is-opened.css');
+@import url('../blocks/toast/_is-animated/toast_is-animated.css');
+@import url('../blocks/toast/_is-opened/toast_is-opened.css');
+
 

@@ -1,0 +1,16 @@
+@import url('./__message/toast__message.css');
+@import url('./__title/toast__title.css');
+@import url('__content/toast__content.css');
+@import url('_is-animated/toast_is-animated.css');
+@import url('_is-opened/toast_is-opened.css');
+
+.toast {
+    font-family: 'Inter', Arial, sans-serif;
+    display: none;
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    align-items: start;
+    justify-content: center;
+    z-index: 10;
+}
