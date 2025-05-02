@@ -11,7 +11,8 @@ const newCardModal = document.querySelector('.popup_type_new-card');
 const imageModal = document.querySelector('.popup_type_image');
 const editProfileModal = document.querySelector('.popup_type_edit');
 const editAvatarModal = document.querySelector('.popup_type_avatar');
-
+const sureDeleteModal = document.querySelector('.popup_type_sure')
+const confirmButton = sureDeleteModal.querySelector('.button');
 const imageModalImage = imageModal.querySelector('.popup__image');
 const imageModalCaption = imageModal.querySelector('.popup__caption');
 
@@ -22,6 +23,8 @@ const profileDescription = document.querySelector('.profile__description');
 const profileDescriptionInput = editProfileForm.elements.description;
 const profileAvatar = document.querySelector('.profile__image');
 const newPlaceForm = document.forms['new-place']
+const placeNameInput = newPlaceForm.elements['place-name']
+const placeLinkInput = newPlaceForm.elements.link
 
 const editAvatarForm = document.forms['edit-avatar'];
 const avatarInput = editAvatarForm.elements.picture;
@@ -46,9 +49,38 @@ function handleImageClick(evt) {
     openModal(imageModal)
 }
 
+function handleDelete(cardElement, cardId) {
+    openModal(sureDeleteModal)
+    confirmButton.addEventListener('click', () => {
+        setLoading(true, confirmButton, "Удаление...")
+        deleteCard(cardElement, cardId).then(() => {
+            closeModal(sureDeleteModal)
+            errorMessage.innerText = ''
+            closeToast(errorToast)
+        })
+            .catch(err => {
+                    errorMessage.innerText = err
+                    showToast(errorToast)
+                }
+            ).finally(() => {
+                setLoading(false, confirmButton, "Да")
+            }
+        )
+    })
+}
 
-function renderCard(item, isLiked, deletePerm, method = "prepend") {
-    const cardElement = createCard(item, isLiked, deletePerm, {deleteCard, handleLike, handleImageClick});
+
+function setLoading(state, buttonElement, text = "") {
+    if (state) {
+        buttonElement.innerText = text || "Сохранение..."
+    } else {
+        buttonElement.innerText = text || "Сохранить"
+    }
+}
+
+
+function renderCard(item, isLiked, deletePerm, handleDelete, method = "prepend") {
+    const cardElement = createCard(item, isLiked, deletePerm, {handleDelete, handleLike, handleImageClick});
     cardsList[method](cardElement);
 }
 
@@ -70,24 +102,21 @@ function renderPage() {
             cards.forEach((card) => {
                 const isLiked = card.likes.some(like => like._id === userData._id)
                 const deletePerm = userData._id === card.owner._id;
-                renderCard(card, isLiked, deletePerm, "append");
+                renderCard(card, isLiked, deletePerm, handleDelete, "append");
             })
         }).catch(err => {
-            errorMessage.innerText = err
-            showToast(errorToast)
+        errorMessage.innerText = err
+        showToast(errorToast)
     })
 }
 
 renderPage()
 
-
-document.querySelector('.profile__add-button')
-    .addEventListener('click', () => {
-        openModal(newCardModal);
-        newPlaceForm.reset();
-        clearValidation(newPlaceForm, validationSettings)
-    })
-
+document.querySelector('.profile__add-button').addEventListener('click', () => {
+    openModal(newCardModal);
+    newPlaceForm.reset();
+    clearValidation(newPlaceForm, validationSettings)
+})
 
 document.querySelector('.profile__edit-button').addEventListener('click', () => {
     openModal(editProfileModal);
@@ -96,13 +125,11 @@ document.querySelector('.profile__edit-button').addEventListener('click', () => 
     clearValidation(editProfileForm, validationSettings)
 })
 
-
 profileAvatar.addEventListener('click', (evt) => {
     openModal(editAvatarModal)
     editAvatarForm.reset()
-    closeModal(editAvatarForm, validationSettings)
+    clearValidation(editAvatarForm, validationSettings)
 })
-
 
 document.querySelectorAll('.popup__close').forEach(cur => {
     cur.addEventListener('click', () => {
@@ -111,13 +138,12 @@ document.querySelectorAll('.popup__close').forEach(cur => {
     })
 })
 
-
 enableValidation(validationSettings)
-
 
 editProfileForm.addEventListener('submit', evt => {
     evt.preventDefault();
-    setLoading(true, editProfileForm);
+    const button = editProfileForm.querySelector('.popup__button');
+    setLoading(true, button);
     editProfile(profileNameInput.value, profileDescriptionInput.value).then(
         res => {
             if (res.ok)
@@ -135,15 +161,14 @@ editProfileForm.addEventListener('submit', evt => {
         errorMessage.innerText = err
         showToast(errorToast)
     }).finally(() => {
-        setLoading(false, editProfileForm);
+        setLoading(false, button);
     })
 })
 
 newPlaceForm.addEventListener('submit', evt => {
     evt.preventDefault();
-    setLoading(true, newPlaceForm);
-    const placeNameInput = newPlaceForm.elements['place-name']
-    const placeLinkInput = newPlaceForm.elements.link
+    const button = newPlaceForm.querySelector('.popup__button');
+    setLoading(true, button);
     newCard(placeNameInput.value, placeLinkInput.value).then(
         res => {
             if (res.ok)
@@ -154,22 +179,22 @@ newPlaceForm.addEventListener('submit', evt => {
     ).then(data => {
         errorMessage.innerText = ''
         closeToast(errorToast)
-        renderCard(data, false, true);
+        renderCard(data, false, true, handleDelete);
         newPlaceForm.reset();
         closeModal(newCardModal);
     }).catch(err => {
         errorMessage.innerText = err
         showToast(errorToast)
     }).finally(() => {
-        setLoading(false, newPlaceForm);
+        setLoading(false, button);
     })
 
 })
 
-
 editAvatarForm.addEventListener('submit', evt => {
     evt.preventDefault();
-    setLoading(true, editAvatarForm)
+    const button = editAvatarForm.querySelector('.popup__button');
+    setLoading(true, button)
     updateAvatar(avatarInput.value).then(res => {
         if (res.ok)
             return res.json()
@@ -187,16 +212,11 @@ editAvatarForm.addEventListener('submit', evt => {
             showToast(errorToast)
         })
         .finally(() => {
-            setLoading(false, editAvatarForm)
+            setLoading(false, button)
         })
 })
 
 
-function setLoading(state, form) {
-    const buttonElement = form.querySelector('.popup__button');
-    if (state) {
-        buttonElement.innerText = "Сохранение..."
-    } else {
-        buttonElement.innerText = "Сохранить"
-    }
-}
+
+
+
