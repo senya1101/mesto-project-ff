@@ -2,12 +2,13 @@ import {addLike, deleteCardPromise, removeLike} from "../scripts/api";
 
 const cardTemplate = document.querySelector('#card-template').content;
 
-export function createCard(card, isLiked, deletePerm, callbacks) {
+export function createCard(card, userId, callbacks) {
     const cardElement = cardTemplate.querySelector('.card').cloneNode(true);
     const cardImage = cardElement.querySelector('.card__image');
     const cardLikeButton = cardElement.querySelector('.card__like-button');
     const deleteButton = cardElement.querySelector('.card__delete-button');
-
+    const deletePerm = card.owner._id === userId
+    const isLiked = card.likes.some(like => like._id === userId);
     deleteButton.style.display = deletePerm ? 'block' : 'none';
     cardImage.src = card.link;
     cardImage.alt = card.name;
@@ -26,11 +27,7 @@ export function createCard(card, isLiked, deletePerm, callbacks) {
 
 
 export const deleteCard = (cardElement, cardId) => {
-   return deleteCardPromise(cardId).then((res) => {
-        if (res.ok)
-            return res.json()
-        else return Promise.reject(res.status);
-    }).then(() => {
+   return deleteCardPromise(cardId).then(() => {
         cardElement.remove()
     })
 }
@@ -38,26 +35,14 @@ export const deleteCard = (cardElement, cardId) => {
 export function handleLike(evt, cardId) {
     if (evt.target.classList.contains('card__like-button')) {
         if (evt.target.classList.contains('card__like-button_is-active')) {
-            removeLike(cardId).then((res) => {
-                if (res.ok)
-                    return res.json()
-                else
-                    return Promise.reject(res.status);
-            })
-                .then(data => {
+            removeLike(cardId).then(data => {
                     evt.target.parentElement.querySelector('.card__like-count').textContent = data.likes.length
                     evt.target.classList.toggle('card__like-button_is-active');
                 }).catch((err) => {
                 console.log(err)
             })
         } else {
-            addLike(cardId).then((res) => {
-                if (res.ok)
-                    return res.json()
-                else
-                    return Promise.reject(res.status);
-            })
-                .then(data => {
+            addLike(cardId).then(data => {
                     evt.target.parentElement.querySelector('.card__like-count').textContent = data.likes.length
                     evt.target.classList.toggle('card__like-button_is-active');
                 }).catch((err) => {

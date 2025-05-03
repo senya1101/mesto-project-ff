@@ -5,6 +5,8 @@ import {enableValidation, clearValidation} from "./validation";
 import {editProfile, getCards, getUser, newCard, updateAvatar} from "./api";
 import {closeToast, showToast} from "../components/toast";
 
+let userId;
+
 const cardsList = document.querySelector('.places__list');
 
 const newCardModal = document.querySelector('.popup_type_new-card');
@@ -51,7 +53,7 @@ function handleImageClick(evt) {
 
 function handleDelete(cardElement, cardId) {
     openModal(sureDeleteModal)
-    confirmButton.addEventListener('click', () => {
+    confirmButton.onClick = (() => {
         setLoading(true, confirmButton, "Удаление...")
         deleteCard(cardElement, cardId).then(() => {
             closeModal(sureDeleteModal)
@@ -79,8 +81,8 @@ function setLoading(state, buttonElement, text = "") {
 }
 
 
-function renderCard(item, isLiked, deletePerm, handleDelete, method = "prepend") {
-    const cardElement = createCard(item, isLiked, deletePerm, {handleDelete, handleLike, handleImageClick});
+function renderCard(item, userId, handleDelete, method = "prepend") {
+    const cardElement = createCard(item, userId, {handleDelete, handleLike, handleImageClick});
     cardsList[method](cardElement);
 }
 
@@ -99,10 +101,9 @@ function renderPage() {
             profileName.innerText = userData.name;
             profileDescription.innerText = userData.about;
             profileAvatar.style.backgroundImage = 'url(' + userData.avatar + ')';
+            userId = userData._id
             cards.forEach((card) => {
-                const isLiked = card.likes.some(like => like._id === userData._id)
-                const deletePerm = userData._id === card.owner._id;
-                renderCard(card, isLiked, deletePerm, handleDelete, "append");
+                renderCard(card, userId, handleDelete, "append");
             })
         }).catch(err => {
         errorMessage.innerText = err
@@ -125,7 +126,7 @@ document.querySelector('.profile__edit-button').addEventListener('click', () => 
     clearValidation(editProfileForm, validationSettings)
 })
 
-profileAvatar.addEventListener('click', (evt) => {
+profileAvatar.addEventListener('click', () => {
     openModal(editAvatarModal)
     editAvatarForm.reset()
     clearValidation(editAvatarForm, validationSettings)
@@ -144,14 +145,7 @@ editProfileForm.addEventListener('submit', evt => {
     evt.preventDefault();
     const button = editProfileForm.querySelector('.popup__button');
     setLoading(true, button);
-    editProfile(profileNameInput.value, profileDescriptionInput.value).then(
-        res => {
-            if (res.ok)
-                return res.json()
-            else
-                return Promise.reject(res.status)
-        }
-    ).then(data => {
+    editProfile(profileNameInput.value, profileDescriptionInput.value).then(data => {
         errorMessage.innerText = ''
         closeToast(errorToast)
         profileName.textContent = data.name;
@@ -169,17 +163,10 @@ newPlaceForm.addEventListener('submit', evt => {
     evt.preventDefault();
     const button = newPlaceForm.querySelector('.popup__button');
     setLoading(true, button);
-    newCard(placeNameInput.value, placeLinkInput.value).then(
-        res => {
-            if (res.ok)
-                return res.json()
-            else
-                return Promise.reject(res.status)
-        }
-    ).then(data => {
+    newCard(placeNameInput.value, placeLinkInput.value).then(data => {
         errorMessage.innerText = ''
         closeToast(errorToast)
-        renderCard(data, false, true, handleDelete);
+        renderCard(data, userId, handleDelete);
         newPlaceForm.reset();
         closeModal(newCardModal);
     }).catch(err => {
@@ -195,11 +182,7 @@ editAvatarForm.addEventListener('submit', evt => {
     evt.preventDefault();
     const button = editAvatarForm.querySelector('.popup__button');
     setLoading(true, button)
-    updateAvatar(avatarInput.value).then(res => {
-        if (res.ok)
-            return res.json()
-        else return Promise.reject(res.status)
-    })
+    updateAvatar(avatarInput.value)
         .then(data => {
             errorMessage.innerText = ''
             closeToast(errorToast)
